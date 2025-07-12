@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Toko Online Sembako VADER</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #b0b3b8; /* Abu-abu metalik */
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+    .banner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      background: #111111; /* Hitam */
+      color: #ff2d2d; /* Merah */
+      text-align: center;
+      padding: 32px 0 24px 0;
+      font-size: 2.2em;
+      font-weight: 700;
+      letter-spacing: 2px;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+    }
+    .banner img {
+      height: 48px;
+      width: 48px;
+      object-fit: contain;
+      margin-right: 10px;
+      filter: grayscale(40%) contrast(120%);
+    }
+    .navigasi {
+      text-align: center;
+      background: #232323; /* Hitam ke abu-abu */
+      padding: 18px 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    }
+    .navigasi button {
+      margin: 0 12px;
+      padding: 10px 28px;
+      font-size: 1em;
+      cursor: pointer;
+      border: none;
+      background: #ff2d2d; /* Merah */
+      color: #fff;
+      border-radius: 5px;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-weight: 500;
+      transition: background 0.2s, color 0.2s;
+    }
+    .navigasi button:hover {
+      background: #b0b3b8; /* Abu-abu metalik */
+      color: #111;
+    }
+    .konten-frame {
+      width: 100%;
+      height: calc(100vh - 130px);
+      border: none;
+      display: block;
+      background: #b0b3b8; /* Abu-abu metalik */
+    }
+    @media (max-width: 600px) {
+      .banner { font-size: 1.3em; padding: 18px 0 12px 0; }
+      .navigasi button { padding: 8px 10px; font-size: 0.95em; margin: 0 4px; }
+      .konten-frame { height: calc(100vh - 100px); }
+    }
+  </style>
+  <script>
+    function gantiKonten(halaman) {
+      document.getElementById('konten').src = halaman;
+    }
+  </script>
+</head>
+<body>
+  <div class="banner">
+    <img src="png-transparent-anakin-skywalker-lego-star-wars-toy-the-force-darth-vader-head-room-c3po-star-wars-darth-vader.png" alt="Logo Toko">
+    <span>Toko Online Sembako VADER</span>
+  </div>
+  <div class="navigasi">
+    <button onclick="gantiKonten('HOME.html')">Home</button>
+    <button onclick="gantiKonten('produk_lokal.html')">Produk Sembako</button>
+  </div>
+  <iframe id="konten" class="konten-frame" src="HOME.html"></iframe>
+</body>
+</html>

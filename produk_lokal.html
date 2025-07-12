@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Produk Lokal - Toko Online Sembako Vader</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #b0b3b8;
+      margin: 0;
+      padding: 0;
+      color: #111;
+    }
+    .container {
+      max-width: 900px;
+      margin: 40px auto 0 auto;
+      background: #232323;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+      padding: 32px 24px;
+      text-align: center;
+    }
+    h2 {
+      color: #ff2d2d;
+      font-size: 2em;
+      margin-bottom: 24px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    .note {
+      background: #b0b3b8;
+      color: #ff2d2d;
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin-bottom: 18px;
+      font-size: 1.08em;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      justify-content: center;
+    }
+    .logo-pembayaran {
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 10px;
+    }
+    .logo-pembayaran img {
+      height: 40px;
+      width: 40px;
+      object-fit: contain;
+      border-radius: 6px;
+      background: #fff;
+      border: 2px solid #ff2d2d;
+    }
+    .lanjut-btn {
+      margin-bottom: 24px;
+      padding: 12px 32px;
+      background: #ff2d2d;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-size: 1.1em;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      display: inline-block;
+    }
+    .lanjut-btn:hover {
+      background: #232323;
+      color: #ff2d2d;
+    }
+    .produk-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+      margin-top: 24px;
+    }
+    .produk-card {
+      background: #b0b3b8;
+      border-radius: 10px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.10);
+      padding: 18px 12px 20px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: 2px solid #232323;
+      position: relative;
+    }
+    .produk-card img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      background: #fff;
+      border: 2px solid #ff2d2d;
+    }
+    .produk-card h3 {
+      font-size: 1.1em;
+      margin: 8px 0 6px 0;
+      color: #ff2d2d;
+      font-weight: 600;
+    }
+    .produk-card p {
+      font-size: 0.98em;
+      color: #232323;
+      margin-bottom: 14px;
+    }
+    .produk-card input[type="checkbox"] {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      transform: scale(1.3);
+      accent-color: #ff2d2d;
+    }
+    @media (max-width: 800px) {
+      .produk-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 500px) {
+      .produk-grid { grid-template-columns: 1fr; }
+      .note { flex-direction: column; gap: 6px; }
+    }
+  </style>
+  <script>
+    function lanjutPembayaran() {
+      // Ambil semua produk yang dicentang
+      const checked = document.querySelectorAll('.produk-card input[type="checkbox"]:checked');
+      if (checked.length === 0) {
+        // Tampilkan peringatan dan cegah lanjut
+        alert('Pilih minimal satu produk dengan mencentang checkbox sebelum melanjutkan ke pembayaran!');
+        return;
+      }
+      // Buat array produk
+      const produkDipilih = [];
+      checked.forEach(cb => {
+        produkDipilih.push({
+          nama: cb.dataset.nama,
+          harga: cb.dataset.harga
+        });
+      });
+      // Simpan ke localStorage
+      localStorage.setItem('keranjang', JSON.stringify(produkDipilih));
+      // Redirect ke pembayaran
+      window.location.href = 'pembayaran.html';
+    }
+  </script>
+</head>
+<body>
+  <div class="container">
+    <div class="note">
+      <span>
+        <strong>Note:</strong> Pilih produk yang diinginkan dengan mencentang checkbox pada produk, lalu klik tombol <b>Proses Pembayaran</b> di bawah ini.
+      </span>
+    </div>
+    <div>
+      <span class="logo-pembayaran">
+        <!-- Ganti src="logo-pembayaran.png" dengan file logo pembayaran yang kamu upload -->
+        <img src="logo-pembayaran.png" alt="Logo Pembayaran">
+      </span>
+      <button class="lanjut-btn" onclick="lanjutPembayaran()">Proses Pembayaran</button>
+    </div>
+    <h2>Produk Lokal</h2>
+    <div class="produk-grid">
+      <div class="produk-card">
+        <input type="checkbox" data-nama="Beras Rajolele" data-harga="15500">
+        <img src="img1.jpg" alt="Beras Rajolele">
+        <h3>Beras Rajolele</h3>
+        <p>1 kg - Rp 15.500</p>
+      </div>
+      <div class="produk-card">
+        <input type="checkbox" data-nama="Minyak Rose Brand 2L" data-harga="41500">
+        <img src="img2.jpg" alt="Minyak Rose Brand">
+        <h3>Minyak Rose Brand</h3>
+        <p>2 liter - Rp 41.500</p>
+      </div>
+      <div class="produk-card">
+        <input type="checkbox" data-nama="Gula Pasir Kristal Putih" data-harga="20000">
+        <img src="img3.jpg" alt="Gula Pasir Kristal Putih">
+        <h3>Gula Pasir Kristal Putih</h3>
+        <p>1 kg - Rp 20.000</p>
+      </div>
+      <div class="produk-card">
+        <input type="checkbox" data-nama="Indofood Telur Omega-3" data-harga="36000">
+        <img src="img4.jpg" alt="Indofood: Telur Omega-3">
+        <h3>Indofood: Telur Omega-3</h3>
+        <p>1 kg - Rp 36.000</p>
+      </div>
+      <div class="produk-card">
+        <input type="checkbox" data-nama="Pak Tani Gunung Tepung Tapioka" data-harga="21000">
+        <img src="img5.jpg" alt="Pak Tani Gunung">
+        <h3>Pak Tani Gunung (Tepung Tapioka)</h3>
+        <p>1 kg - Rp 21.000</p>
+      </div>
+      <div class="produk-card">
+        <input type="checkbox" data-nama="Yeyen Mie Pangsit" data-harga="8500">
+        <img src="img6.jpg" alt="Yeyen Mie Pangsit">
+        <h3>Yeyen Mie Pangsit</h3>
+        <p>1 pcs - Rp 8.500</p>
+      </div>
+      <div class="produk-card">
+        <input type="checkbox" data-nama="Oatly Milk" data-harga="62000">
+        <img src="img7.jpg" alt="Oatly Milk">
+        <h3>Oatly Milk</h3>
+        <p>1 liter - Rp 62.000</p>
+      </div>
+      <div class="produk-card">
+        <input type="checkbox" data-nama="Garam Garena 200gr" data-harga="20000">
+        <img src="img8.jpg" alt="Garam Garena 200gr">
+        <h3>Garam Garena 200gr</h3>
+        <p>200 gr - Rp 20.000</p>
+      </div>
+      <div class="produk-card">
+        <input type="checkbox" data-nama="Omela Consended Milk 370gr" data-harga="13000">
+        <img src="img9.jpg" alt="Omela Consended Milk">
+        <h3>Omela Consended Milk</h3>
+        <p>370 gr - Rp 13.000</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

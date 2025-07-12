@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pembayaran - Toko Online Sembako VADER</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #b0b3b8; /* Abu-abu metalik */
+      margin: 0;
+      padding: 0;
+      color: #111; /* Hitam */
+    }
+    .container {
+      max-width: 420px;
+      margin: 40px auto;
+      background: #232323; /* Hitam ke abu-abu */
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+      padding: 28px 20px 20px 20px;
+    }
+    h2 {
+      color: #ff2d2d; /* Merah */
+      margin-bottom: 18px;
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin-top: 14px;
+      margin-bottom: 6px;
+      font-weight: 500;
+      color: #ff2d2d; /* Merah */
+      text-align: left;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 8px;
+      border-radius: 5px;
+      border: 1px solid #b0b3b8; /* Abu-abu metalik */
+      margin-bottom: 12px;
+      font-size: 1em;
+      box-sizing: border-box;
+      background: #fff;
+      color: #111;
+    }
+    .ringkasan {
+      background: #b0b3b8; /* Abu-abu metalik */
+      border-radius: 8px;
+      padding: 12px 10px;
+      margin-bottom: 16px;
+      font-size: 1em;
+      text-align: left;
+      color: #111;
+      border: 1.5px solid #ff2d2d;
+    }
+    .ringkasan strong {
+      color: #ff2d2d;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #ff2d2d; /* Merah */
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-size: 1.1em;
+      cursor: pointer;
+      margin-top: 10px;
+      font-weight: 600;
+      transition: background 0.2s, color 0.2s;
+    }
+    button:hover {
+      background: #232323; /* Hitam ke abu-abu */
+      color: #ff2d2d;
+    }
+    @media (max-width: 500px) {
+      .container { padding: 12px 4px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Pembayaran</h2>
+    <div class="ringkasan" id="ringkasan">
+      <strong>Ringkasan Pesanan:</strong>
+      <form id="form-qty">
+        <table style="width:100%;color:#111;margin-bottom:12px;">
+          <thead>
+            <tr>
+              <th style="text-align:left;">Produk</th>
+              <th style="text-align:right;">Harga</th>
+              <th style="text-align:center;">Qty</th>
+              <th style="text-align:right;">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody id="daftar-produk"></tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3" style="text-align:right;"><b>Total:</b></td>
+              <td style="text-align:right;"><b id="total-harga">Rp 0</b></td>
+            </tr>
+          </tfoot>
+        </table>
+      </form>
+    </div>
+    <form id="form-pembayaran" autocomplete="on">
+      <label for="nama">Nama Lengkap</label>
+      <input type="text" id="nama" name="nama" required autocomplete="name">
+
+      <label for="alamat">Alamat Pengiriman</label>
+      <textarea id="alamat" name="alamat" rows="3" required autocomplete="street-address"></textarea>
+
+      <label for="telepon">Nomor Telepon</label>
+      <input type="tel" id="telepon" name="telepon" required autocomplete="tel">
+
+      <label for="metode">Metode Pembayaran</label>
+      <select id="metode" name="metode" required>
+        <option value="">-- Pilih Metode --</option>
+        <option value="transfer">Transfer Bank</option>
+        <option value="cod">COD (Bayar di Tempat)</option>
+        <option value="ewallet">E-Wallet</option>
+      </select>
+
+      <button type="submit">Konfirmasi Pembayaran</button>
+    </form>
+    <div id="invoice" style="display:none; background:#232323; color:#fff; margin-top:24px; padding:22px; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,0.18); font-family:'Segoe UI',Arial,sans-serif;">
+    </div>
+    <button id="download-btn" style="display:none; margin-top:12px; background:#ff2d2d; color:#fff; border:none; border-radius:5px; padding:10px 24px; font-weight:600; cursor:pointer;">Download Invoice PDF</button>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script>
+  // Ambil parameter dari URL
+  function getQueryParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+  }
+  // Isi otomatis nama produk, harga, dan hitung total
+  document.addEventListener('DOMContentLoaded', function() {
+    const produk = getQueryParam('produk');
+    const harga = getQueryParam('harga');
+    const qtyInput = document.getElementById('qty');
+    const hargaSpan = document.getElementById('harga');
+    const totalSpan = document.getElementById('total');
+    let hargaNum = harga ? Number(harga) : 0;
+
+    if(produk) document.getElementById('produk').textContent = produk;
+    if(harga) hargaSpan.textContent = 'Rp ' + hargaNum.toLocaleString('id-ID');
+    function updateTotal() {
+      const qty = Number(qtyInput.value) || 1;
+      totalSpan.textContent = 'Rp ' + (hargaNum * qty).toLocaleString('id-ID');
+    }
+    qtyInput.addEventListener('input', updateTotal);
+    updateTotal();
+  });
+  // Ambil data keranjang dari localStorage
+  document.addEventListener('DOMContentLoaded', function() {
+    const keranjang = JSON.parse(localStorage.getItem('keranjang') || '[]');
+    const daftarProduk = document.getElementById('daftar-produk');
+    const totalHarga = document.getElementById('total-harga');
+
+    function updateTotal() {
+      let total = 0;
+      keranjang.forEach((item, idx) => {
+        const qty = Number(document.getElementById('qty-' + idx).value) || 1;
+        const harga = Number(item.harga) || 0;
+        const subtotal = qty * harga;
+        document.getElementById('subtotal-' + idx).textContent = 'Rp ' + subtotal.toLocaleString('id-ID');
+        total += subtotal;
+      });
+      totalHarga.textContent = 'Rp ' + total.toLocaleString('id-ID');
+    }
+
+    if (keranjang.length === 0) {
+      daftarProduk.innerHTML = '<tr><td colspan="4"><em>Tidak ada produk yang dipilih.</em></td></tr>';
+      totalHarga.textContent = 'Rp 0';
+    } else {
+      keranjang.forEach((item, idx) => {
+        const hargaNum = Number(item.harga) || 0;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${item.nama}</td>
+          <td style="text-align:right;">Rp ${hargaNum.toLocaleString('id-ID')}</td>
+          <td style="text-align:center;">
+            <input type="number" id="qty-${idx}" name="qty-${idx}" value="1" min="1" style="width:50px;">
+          </td>
+          <td style="text-align:right;" id="subtotal-${idx}">Rp ${hargaNum.toLocaleString('id-ID')}</td>
+        `;
+        daftarProduk.appendChild(tr);
+      });
+      // Event listener untuk semua input qty
+      keranjang.forEach((item, idx) => {
+        document.getElementById('qty-' + idx).addEventListener('input', updateTotal);
+      });
+      updateTotal();
+    }
+  });
+  function tampilkanInvoice(event) {
+    event.preventDefault();
+    // Ambil data pembeli
+    const nama = document.getElementById('nama').value;
+    const alamat = document.getElementById('alamat').value;
+    const telepon = document.getElementById('telepon').value;
+    const metode = document.getElementById('metode').value;
+    // Ambil data produk
+    const keranjang = JSON.parse(localStorage.getItem('keranjang') || '[]');
+    let total = 0;
+    const detailProduk = keranjang.map((item, idx) => {
+      const harga = Number(item.harga) || 0;
+      const qty = Number(document.getElementById('qty-' + idx).value) || 1;
+      const subtotal = harga * qty;
+      total += subtotal;
+      return {
+        nama: item.nama,
+        harga: harga,
+        qty: qty,
+        subtotal: subtotal
+      };
+    });
+
+    // Simpan ke "database" invoice di localStorage
+    const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+    const invoiceBaru = {
+      waktu: new Date().toISOString(),
+      nama,
+      alamat,
+      telepon,
+      metode,
+      produk: detailProduk,
+      total
+    };
+    invoices.push(invoiceBaru);
+    localStorage.setItem('invoices', JSON.stringify(invoices));
+
+    let invoiceHTML = `
+      <h3 style="color:#ff2d2d; text-align:center; margin-bottom:18px;">INVOICE PEMBAYARAN</h3>
+      <div style="margin-bottom:10px;">
+        <b>Nama:</b> ${nama}<br>
+        <b>Alamat:</b> ${alamat}<br>
+        <b>Telepon:</b> ${telepon}<br>
+        <b>Metode Pembayaran:</b> ${metode}
+      </div>
+      <table style="width:100%;border-collapse:collapse;background:#232323;">
+        <thead>
+          <tr style="background:#ff2d2d;color:#fff;">
+            <th style="padding:8px;border-radius:6px 0 0 0;">Produk</th>
+            <th style="padding:8px;">Harga</th>
+            <th style="padding:8px;">Qty</th>
+            <th style="padding:8px;border-radius:0 6px 0 0;">Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+    detailProduk.forEach((item, idx) => {
+      invoiceHTML += `
+        <tr style="background:${idx%2===0 ? '#2e2e2e' : '#3a3a3a'};color:#fff;">
+          <td style="padding:7px 6px;">${item.nama}</td>
+          <td style="padding:7px 6px;">Rp ${item.harga.toLocaleString('id-ID')}</td>
+          <td style="padding:7px 6px; text-align:center;">${item.qty}</td>
+          <td style="padding:7px 6px;">Rp ${item.subtotal.toLocaleString('id-ID')}</td>
+        </tr>
+      `;
+    });
+    invoiceHTML += `
+        </tbody>
+      </table>
+      <div style="margin-top:16px; text-align:right;">
+        <b style="color:#ff2d2d;font-size:1.15em;">Total: Rp ${total.toLocaleString('id-ID')}</b>
+      </div>
+    `;
+    document.getElementById('invoice').innerHTML = invoiceHTML;
+    document.getElementById('invoice').style.display = 'block';
+    document.getElementById('download-btn').style.display = 'inline-block';
+  }
+
+  // Download PDF
+  function downloadPDF() {
+    const { jsPDF } = window.jspdf;
+    const invoice = document.getElementById('invoice');
+    html2canvas(invoice, { scale: 2 }).then(canvas => {
+      const imgData = canvas.toDataURL('image/png');
+      // Hitung ukuran PDF berdasarkan rasio canvas
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = pageWidth - 20; // 10mm margin kiri-kanan
+      const imgHeight = canvas.height * imgWidth / canvas.width;
+
+      let position = 10;
+      if (imgHeight < pageHeight - 20) {
+        // Jika muat satu halaman
+        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+      } else {
+        // Jika lebih dari satu halaman
+        let heightLeft = imgHeight;
+        let y = 10;
+        while (heightLeft > 0) {
+          pdf.addImage(imgData, 'PNG', 10, y, imgWidth, imgHeight);
+          heightLeft -= (pageHeight - 20);
+          if (heightLeft > 0) {
+            pdf.addPage();
+            y = 0;
+          }
+        }
+      }
+      pdf.save('invoice-sembako.pdf');
+    });
+  }
+  document.getElementById('form-pembayaran').addEventListener('submit', tampilkanInvoice);
+  document.getElementById('download-btn').addEventListener('click', downloadPDF);
+  </script>
+</body>
+</html>
